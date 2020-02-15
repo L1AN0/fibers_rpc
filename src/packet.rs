@@ -16,22 +16,22 @@ const FLAG_ASYNC: u8 = 0b0000_0010;
 pub struct PacketHeader {
     pub message: MessageHeader,
     pub flags: u8,
-    pub payload_len: u16,
+    pub payload_len: u32,
 }
 impl PacketHeader {
-    pub const SIZE: usize = MessageHeader::SIZE + 1 + 2;
+    pub const SIZE: usize = MessageHeader::SIZE + 1 + 4;
 
     fn write(&self, buf: &mut [u8]) {
         self.message.write(buf);
         buf[MessageHeader::SIZE] = self.flags;
-        BigEndian::write_u16(&mut buf[MessageHeader::SIZE + 1..], self.payload_len);
+        BigEndian::write_u32(&mut buf[MessageHeader::SIZE + 1..], self.payload_len);
     }
 
     fn read(buf: &[u8]) -> Self {
         let mut message = MessageHeader::read(buf);
         let flags = buf[MessageHeader::SIZE];
         message.is_async = (flags & FLAG_ASYNC) != 0;
-        let payload_len = BigEndian::read_u16(&buf[MessageHeader::SIZE + 1..]);
+        let payload_len = BigEndian::read_u32(&buf[MessageHeader::SIZE + 1..]);
         PacketHeader {
             message,
             flags,
@@ -104,7 +104,7 @@ impl Encode for PacketizedMessage {
         let packet_header = PacketHeader {
             message: self.message.header.clone(),
             flags,
-            payload_len: payload_len as u16,
+            payload_len: payload_len as u32,
         };
         packet_header.write(buf);
         Ok(PacketHeader::SIZE + payload_len)

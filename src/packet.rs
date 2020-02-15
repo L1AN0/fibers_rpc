@@ -7,7 +7,7 @@ use std::cmp;
 
 pub const MIN_PACKET_LEN: usize = PacketHeader::SIZE;
 pub const MAX_PACKET_LEN: usize = PacketHeader::SIZE + MAX_PAYLOAD_LEN;
-pub const MAX_PAYLOAD_LEN: usize = 1048575;
+pub const MAX_PAYLOAD_LEN: usize = 16777215;
 
 const FLAG_END_OF_MESSAGE: u8 = 0b0000_0001;
 const FLAG_ASYNC: u8 = 0b0000_0010;
